@@ -1,12 +1,14 @@
 package com.mvieiradev.invest_robot.infrastructure.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Entity
@@ -25,15 +27,17 @@ public class Carteira {
     private String descricao;
 
     @Column(name = "valor_total")
-    private Double valorTotal;
+    private BigDecimal valorTotal;
 
-    // --- RELACIONAMENTO COM USUÁRIO (Muitas carteiras para 1 usuário) ---
+    // relacionamento com usuario (Muitas carteiras para 1 usuário)
+    // WRITE_ONLY: Significa que o campo só funciona na "escrita" (quando você manda o JSON para o Java).
+    // No momento de "leitura" (quando o Java responde para o Postman), ele ignora o campo, impedindo o loop infinito.
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @ManyToOne
-    @JoinColumn(name = "id_usuario") // <--- Tem que ser igual ao SQL
-    @JsonIgnore // <--- OBRIGATÓRIO: Impede o Loop Infinito (Carteira -> Usuario -> Carteira...)
+    @JoinColumn(name = "id_usuario")
     private Usuario usuario;
 
-    // --- RELACIONAMENTO COM ITENS (1 Carteira tem vários itens) ---
+    // relacionamento com itens (1 Carteira tem vários itens)
     @OneToMany(mappedBy = "carteira")
     private List<CarteiraItem> itens;
 }

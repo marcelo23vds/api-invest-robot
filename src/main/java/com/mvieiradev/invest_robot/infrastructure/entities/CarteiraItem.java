@@ -1,17 +1,12 @@
 package com.mvieiradev.invest_robot.infrastructure.entities;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import java.math.BigDecimal;
 
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
+@Getter @Setter
+@NoArgsConstructor @AllArgsConstructor
 @Entity
 @Table(name = "tb_carteira_item")
 public class CarteiraItem {
@@ -20,24 +15,20 @@ public class CarteiraItem {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // --- LIGAÇÃO COM A CARTEIRA (PAI) ---
+    // Permite que você envie o ID da carteira, mas evita loop no retorno
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @ManyToOne
-    @JoinColumn(name = "id_carteira") // <--- Tem que bater com o SQL
-    @JsonIgnore // <--- OBRIGATÓRIO!
-    // Se não colocar isso, quando você listar os itens, ele tenta mostrar a carteira,
-    // que mostra os itens, que mostra a carteira... (Loop Infinito)
+    @JoinColumn(name = "id_carteira")
     private Carteira carteira;
 
-    // --- LIGAÇÃO COM O ATIVO (A AÇÃO EM SI) ---
+    // Aqui NÃO usamos WRITE_ONLY, pois quando listarmos os itens,
+    // queremos ver os dados do Ativo (Ticker, Cotação)
     @ManyToOne
-    @JoinColumn(name = "id_ativo") // <--- Tem que bater com o SQL
-    // AQUI NÃO TEM @JsonIgnore!
-    // Motivo: Quando eu consulto o item, eu QUERO saber qual é a ação (PETR4, VALE3).
-    // O Ativo não tem lista de itens, então não gera loop.
+    @JoinColumn(name = "id_ativo")
     private Ativo ativo;
 
     private Integer quantidade;
 
-    @Column(name = "percentual_alvo") // <--- Mapeando percentual_alvo
+    @Column(name = "percentual_alvo", precision = 5, scale = 2)
     private BigDecimal percentualAlvo;
 }
