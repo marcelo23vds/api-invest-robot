@@ -33,4 +33,15 @@ public class AtivoController {
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Ativo> atualizar(@PathVariable Long id, @RequestBody Ativo ativo) {
+        return ResponseEntity.ok(service.atualizar(id, ativo));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deletar(@PathVariable Long id) {
+        service.deletar(id);
+        return ResponseEntity.noContent().build();
+    }
 }

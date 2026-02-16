@@ -26,4 +26,18 @@ public class CarteiraItemController {
     public ResponseEntity<List<CarteiraItem>> listarPorCarteira(@PathVariable Long carteiraId) {
         return ResponseEntity.ok(service.listarPorCarteira(carteiraId));
     }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<CarteiraItem> atualizar(
+            @PathVariable Long id,
+            @RequestBody CarteiraItem item) {
+
+        return ResponseEntity.ok(service.atualizar(id, item));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deletar(@PathVariable Long id) {
+        service.deletar(id);
+        return ResponseEntity.noContent().build();
+    }
 }

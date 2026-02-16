@@ -16,11 +16,24 @@ public class AtivoService {
         this.repository = repository;
     }
 
-    // Salva/atualiza um ativo (Ex: PETR4)
+    // Salva um ativo (Ex: PETR4)
     public Ativo salvar(Ativo ativo) {
         // converter o ticker sempre para MAIUSCULO
         ativo.setTicker(ativo.getTicker().toUpperCase());
         return repository.save(ativo);
+    }
+
+    public Ativo atualizar(Long id, Ativo ativoAtualizado) {
+        return repository.findById(id).map(ativoExistente -> {
+            // Só atualiza se o campo vier preenchido
+            if (ativoAtualizado.getTicker() != null) {
+                ativoExistente.setTicker(ativoAtualizado.getTicker());
+            }
+            if (ativoAtualizado.getCotacao() != null) {
+                ativoExistente.setCotacao(ativoAtualizado.getCotacao());
+            }
+            return repository.save(ativoExistente);
+        }).orElseThrow(() -> new RuntimeException("Ativo não encontrado!"));
     }
 
     public List<Ativo> listarTodos() {
@@ -32,6 +45,9 @@ public class AtivoService {
     }
 
     public void deletar(Long id) {
+        if (!repository.existsById(id)) {
+            throw new RuntimeException("Ativo não encontrado!");
+        }
         repository.deleteById(id);
     }
 }
